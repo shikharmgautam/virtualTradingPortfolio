@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply text-gray-900 dark:text-gray-100 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  body {
+    @apply bg-gray-50 dark:bg-dark-50;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white dark:bg-dark-100 rounded-lg shadow-card dark:shadow-card-dark p-6 transition-all duration-300 hover:shadow-lg dark:border dark:border-dark-200;
+  }
+
+  .button {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-dark-100;
+  }
+
+  .button-primary {
+    @apply button bg-primary-600 hover:bg-primary-700 text-white dark:text-gray-100 focus:ring-primary-500;
+  }
+
+  .button-success {
+    @apply button bg-success hover:bg-green-600 text-white dark:text-gray-100 focus:ring-green-500;
+  }
+
+  .button-error {
+    @apply button bg-error hover:bg-red-600 text-white dark:text-gray-100 focus:ring-red-500;
+  }
+
+  .button-neutral {
+    @apply button bg-gray-200 dark:bg-dark-200 hover:bg-gray-300 dark:hover:bg-dark-300 text-gray-800 dark:text-gray-200 focus:ring-gray-400;
+  }
+
+  .text-muted {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+
+  .text-default {
+    @apply text-gray-900 dark:text-gray-100;
+  }
+}
