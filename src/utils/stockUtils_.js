@@ -1,20 +1,11 @@
-// import { spawn } from 'child_process';
-
 /**
  * Fetches stock data for a given symbol
  * In a real application, this would call an actual API
  */
 export const fetchStockData = async (symbol) => {
-  // Fetch from backend endpoint instead of running Python directly
-  return await fetchStockDataFromPython(symbol);
-};
-
-const fetchStockDataFromPython = async (symbol) => {
-  const res = await fetch(`http://localhost:3000/stockdata/${encodeURIComponent(symbol)}`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch stock data from backend');
-  }
-  return await res.json();
+  // In a real app, we would fetch from a real API like Alpha Vantage or Yahoo Finance
+  // For this demo, we'll generate mock data
+  return generateMockData(symbol);
 };
 
 /**
@@ -124,7 +115,7 @@ const generateSignals = (data) => {
     } else if (result[i].rsi > 70 && result[i].close < result[i].ma9) {
       result[i].signal = 'SELL';
     } else {
-      result[i].signal = '-';
+      result[i].signal = 'HOLD';
     }
   }
   

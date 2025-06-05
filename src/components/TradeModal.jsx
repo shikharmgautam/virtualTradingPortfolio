@@ -5,22 +5,20 @@ import { formatPrice } from '../utils/formatters';
 const TradeModal = ({ isOpen, onClose, stock, type, currentPrice }) => {
   const [shares, setShares] = useState('');
   const [error, setError] = useState('');
-  const { executeOrder, COMMISSION_PER_TRADE, portfolio } = usePortfolioContext();
+  const { executeOrder, COMMISSION_PER_TRADE } = usePortfolioContext();
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     const shareCount = Number(shares);
     if (!shareCount || shareCount <= 0) {
       setError('Please enter a valid number of shares');
       return;
     }
-
     try {
-      executeOrder(type, stock, shareCount, currentPrice);
+      await executeOrder(type, stock, shareCount, currentPrice);
       onClose();
       setShares('');
     } catch (err) {
