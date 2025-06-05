@@ -21,8 +21,8 @@ export const PortfolioProvider = ({ children }) => {
   const fetchPortfolioFromBackend = async () => {
     try {
       const [tradesRes, positionsRes] = await Promise.all([
-        axios.get('http://localhost:3000/trades'),
-        axios.get('http://localhost:3000/positions')
+        axios.get('/trades'),
+        axios.get('/positions')
       ]);
       const trades = Array.isArray(tradesRes.data) ? tradesRes.data : [];
       const positionsArr = Array.isArray(positionsRes.data) ? positionsRes.data : [];
@@ -75,7 +75,7 @@ export const PortfolioProvider = ({ children }) => {
 
     // POST trade to backend
     try {
-      await axios.post('http://localhost:3000/trade', {
+      await axios.post('/trade', {
         date: new Date().toISOString(),
         type: type || '',
         symbol: stock?.value ?? '',

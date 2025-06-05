@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: nifty50-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+    rootDir: server
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+
+  - type: web
+    name: nifty50-frontend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview -- --host 0.0.0.0 --port 8080
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+    rootDir: .
+    routes:
+      - type: rewrite
+        source: /trade
+        destination: https://nifty50-backend.onrender.com/trade
+      - type: rewrite
+        source: /trades
+        destination: https://nifty50-backend.onrender.com/trades
+      - type: rewrite
+        source: /positions
+        destination: https://nifty50-backend.onrender.com/positions
+      - type: rewrite
+        source: /stockdata
+        destination: https://nifty50-backend.onrender.com/stockdata
