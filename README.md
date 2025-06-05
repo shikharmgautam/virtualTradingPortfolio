@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/4c49bb4b-8b0f-460e-aed0-af1c3c854076)# Nifty50 Virtual Trading Portfolio
+Nifty50 Virtual Trading Portfolio
 
 A full-stack web application for virtual trading and portfolio management using Nifty50 stocks. This project features a React frontend, a Node.js/Express backend with SQLite, and a Supabase Edge Function for fetching real stock data from Yahoo Finance.
 
