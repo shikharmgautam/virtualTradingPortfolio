@@ -17,7 +17,7 @@ services:
     name: nifty50-frontend
     env: node
     plan: free
-    buildCommand: npx vite build
+    buildCommand: npm install && npm run build
     startCommand: npm run preview -- --host 0.0.0.0 --port 8080
     envVars:
       - key: NODE_ENV
