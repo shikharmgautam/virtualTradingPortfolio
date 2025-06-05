@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bodyParser = require('body-parser');
 const { spawn } = require('child_process');
+const fs = require('fs');
 
 const app = express();
 
@@ -16,6 +17,14 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Ensure /data directory exists on Render
+if (process.env.RENDER) {
+  try {
+    fs.mkdirSync('/data', { recursive: true });
+  } catch (e) {
+    console.error('Could not create /data directory:', e);
+  }
+}
 const dbPath = process.env.RENDER ? '/data/data.ab' : path.join(__dirname, 'data.ab');
 const db = new sqlite3.Database(dbPath);
 console.log('Database path:', dbPath);
