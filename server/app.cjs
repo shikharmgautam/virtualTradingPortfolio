@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bodyParser = require('body-parser');
 const { spawn } = require('child_process');
@@ -17,9 +16,13 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const dbPath = process.env.RENDER ? '/data/data.ab' : path.join(__dirname, 'data.ab');
-const db = new sqlite3.Database(dbPath);
+const dbPath = process.env.DB_PATH || path.join('/tmp', 'data.ab');
 console.log('Database path:', dbPath);
+
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) console.error(err);
+});
 
 // Create trades table if not exist, then start server
 db.serialize(() => {
