@@ -8,6 +8,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: DB_PATH
+        value: /tmp/data.ab
     autoDeploy: true
     rootDir: server
 
@@ -15,7 +17,7 @@ services:
     name: nifty50-frontend
     env: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npx vite build
     startCommand: npm run preview -- --host 0.0.0.0 --port 8080
     envVars:
       - key: NODE_ENV
