@@ -60,7 +60,6 @@ npm install
 ### 4. Running Locally
 #### Start Backend
 ```
-cd server
 node app.cjs
 ```
 #### Start Frontend (in a new terminal)
