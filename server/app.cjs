@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
-const { spawn } = require('child_process');
 const fs = require('fs');
+const yahooFinance = require('yahoo-finance2').default;
 
 const app = express();
 
@@ -207,39 +207,16 @@ app.delete('/trade/:id', (req, res) => {
     );
 });
 
-// Add this endpoint to fetch stock data using Python script
-app.get('/stockdata/:symbol', (req, res) => {
+// Add this endpoint to fetch stock data using Yahoo Finance Node.js library
+app.get('/stockdata/:symbol', async (req, res) => {
     try {
         const symbol = req.params.symbol;
-        const py = spawn('python', [path.join(__dirname, 'fetch_stock_data.py'), symbol]);
-        let data = '';
-        let error = '';
-
-        py.stdout.on('data', (chunk) => {
-            data += chunk.toString();
-        });
-
-        py.stderr.on('data', (chunk) => {
-            error += chunk.toString();
-        });
-
-        py.on('close', (code) => {
-            if (code !== 0 || error) {
-                console.error('Python error:', error);
-                res.status(500).json({ error: error || `Python process exited with code ${code}` });
-            } else {
-                try {
-                    const parsed = JSON.parse(data);
-                    res.json(parsed);
-                } catch (e) {
-                    console.error('JSON parse error:', e, 'Raw data:', data);
-                    res.status(500).json({ error: 'Failed to parse Python output: ' + e.message });
-                }
-            }
-        });
+        // Fetch quote summary for the symbol
+        const result = await yahooFinance.quoteSummary(symbol, { modules: ['price', 'summaryDetail'] });
+        res.json(result);
     } catch (err) {
-        console.error('Server error:', err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Yahoo Finance error:', err);
+        res.status(500).json({ error: 'Failed to fetch stock data: ' + err.message });
     }
 });
 
