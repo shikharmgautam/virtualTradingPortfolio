@@ -17,10 +17,7 @@ services:
     name: nifty50-frontend
     env: node
     plan: free
-    buildCommand: npm install && npm ci && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: npm run preview -- --host 0.0.0.0 --port 8080
-    envVars:
-      - key: NODE_ENV
-        value: production
     autoDeploy: true
     rootDir: .
