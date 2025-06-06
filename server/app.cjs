@@ -7,9 +7,11 @@ const fs = require('fs');
 
 const app = express();
 
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+
 // ✅ Allow requests from React frontend
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: FRONTEND_ORIGIN,
   credentials: true
 }));
 
