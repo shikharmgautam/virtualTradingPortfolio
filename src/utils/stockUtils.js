@@ -5,12 +5,8 @@
  * In a real application, this would call an actual API
  */
 export const fetchStockData = async (symbol) => {
-  // Fetch from backend endpoint instead of running Python directly
-  return await fetchStockDataFromPython(symbol);
-};
-
-const fetchStockDataFromPython = async (symbol) => {
-  const res = await fetch(`https://nifty50-backend-vl5n.onrender.com/stockdata/${encodeURIComponent(symbol)}`);
+  // Fetch from backend endpoint (which calls the Python yfinance script)
+  const res = await fetch(`/stockdata/${encodeURIComponent(symbol)}`);
   if (!res.ok) {
     throw new Error('Failed to fetch stock data from backend');
   }
