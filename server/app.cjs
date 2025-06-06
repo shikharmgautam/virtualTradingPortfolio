@@ -211,7 +211,7 @@ app.delete('/trade/:id', (req, res) => {
 app.get('/stockdata/:symbol', async (req, res) => {
     const symbol = req.params.symbol;
     // Use Python script to fetch stock data
-    exec(`python3 server/fetch_stock_data.py ${symbol}`, (err, stdout, stderr) => {
+    exec(`python3 fetch_stock_data.py ${symbol}`, (err, stdout, stderr) => {
         if (err) {
             console.error('Python error:', stderr);
             return res.status(500).json({ error: stderr || err.message });
