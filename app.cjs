@@ -3,7 +3,7 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bodyParser = require('body-parser');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const yahooFinance = require('yahoo-finance2').default;
 
 const app = express();
@@ -200,36 +200,26 @@ app.delete('/trade/:id', (req, res) => {
     );
 });
 
-// Node-only endpoint for fetching stock data from Yahoo Finance
+// Node-only endpoint for fetching stock data from Yahoo Finance or Python script
 app.get('/stockdata/:symbol', async (req, res) => {
-    try {
-        const symbol = req.params.symbol;
-        // Fetch last 100 days of daily historical data
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - 100);
-        const result = await yahooFinance.historical(symbol, {
-            period1: startDate,
-            period2: endDate,
-            interval: '1d'
-        });
-        if (!Array.isArray(result) || result.length === 0) {
-            return res.status(404).json({ error: `No data for ${symbol}` });
+    const symbol = req.params.symbol;
+    // Try Python script first (for Render compatibility)
+    exec(`python3 server/fetch_stock_data.py ${symbol}`, (err, stdout, stderr) => {
+        if (err) {
+            console.error('Python error:', stderr);
+            return res.status(500).json({ error: stderr || err.message });
         }
-        // Format to match frontend expectations
-        const formatted = result.map(bar => ({
-            date: bar.date ? new Date(bar.date).toISOString().slice(0, 10) : null,
-            open: bar.open,
-            high: bar.high,
-            low: bar.low,
-            close: bar.close,
-            volume: bar.volume
-        }));
-        return res.json(formatted);
-    } catch (e) {
-        console.error("Yahoo-Finance fetch error:", e);
-        return res.status(500).json({ error: e.message });
-    }
+        try {
+            const data = JSON.parse(stdout);
+            if (!Array.isArray(data) || data.length === 0) {
+                return res.status(404).json({ error: `No data for ${symbol}` });
+            }
+            return res.json(data);
+        } catch (e) {
+            console.error('JSON parse error:', e, stdout);
+            return res.status(500).json({ error: 'Failed to parse Python output' });
+        }
+    });
 });
 
 // Add endpoint to get all positions (was holdings)
