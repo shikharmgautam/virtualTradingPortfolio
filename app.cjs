@@ -204,25 +204,28 @@ app.delete('/trade/:id', (req, res) => {
 app.get('/stockdata/:symbol', async (req, res) => {
     try {
         const symbol = req.params.symbol;
-        // Fetch quote data from Yahoo Finance
-        const queryOptions = { modules: ["price", "summaryDetail"] };
-        const data = await yahooFinance.quote(symbol, queryOptions);
-        if (!data || !data.price) {
+        // Fetch last 100 days of daily historical data
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 100);
+        const result = await yahooFinance.historical(symbol, {
+            period1: startDate,
+            period2: endDate,
+            interval: '1d'
+        });
+        if (!Array.isArray(result) || result.length === 0) {
             return res.status(404).json({ error: `No data for ${symbol}` });
         }
-        // Pick the fields you need
-        const result = {
-            symbol: data.price.symbol,
-            shortName: data.price.shortName,
-            regularMarketPrice: data.price.regularMarketPrice,
-            previousClose: data.price.regularMarketPreviousClose,
-            open: data.price.regularMarketOpen,
-            dayHigh: data.price.regularMarketDayHigh,
-            dayLow: data.price.regularMarketDayLow,
-            currency: data.price.currency,
-            timestamp: data.price.regularMarketTime,
-        };
-        return res.json(result);
+        // Format to match frontend expectations
+        const formatted = result.map(bar => ({
+            date: bar.date ? new Date(bar.date).toISOString().slice(0, 10) : null,
+            open: bar.open,
+            high: bar.high,
+            low: bar.low,
+            close: bar.close,
+            volume: bar.volume
+        }));
+        return res.json(formatted);
     } catch (e) {
         console.error("Yahoo-Finance fetch error:", e);
         return res.status(500).json({ error: e.message });
