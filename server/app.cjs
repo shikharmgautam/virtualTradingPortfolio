@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const yahooFinance = require('yahoo-finance2').default;
+const { exec } = require('child_process');
 
 const app = express();
 
@@ -207,17 +207,26 @@ app.delete('/trade/:id', (req, res) => {
     );
 });
 
-// Add this endpoint to fetch stock data using Yahoo Finance Node.js library
+// Replace Yahoo Finance Node.js endpoint with Python yfinance script
 app.get('/stockdata/:symbol', async (req, res) => {
-    try {
-        const symbol = req.params.symbol;
-        // Fetch quote summary for the symbol
-        const result = await yahooFinance.quoteSummary(symbol, { modules: ['price', 'summaryDetail'] });
-        res.json(result);
-    } catch (err) {
-        console.error('Yahoo Finance error:', err);
-        res.status(500).json({ error: 'Failed to fetch stock data: ' + err.message });
-    }
+    const symbol = req.params.symbol;
+    // Use Python script to fetch stock data
+    exec(`python3 server/fetch_stock_data.py ${symbol}`, (err, stdout, stderr) => {
+        if (err) {
+            console.error('Python error:', stderr);
+            return res.status(500).json({ error: stderr || err.message });
+        }
+        try {
+            const data = JSON.parse(stdout);
+            if (!Array.isArray(data) || data.length === 0) {
+                return res.status(404).json({ error: `No data for ${symbol}` });
+            }
+            return res.json(data);
+        } catch (e) {
+            console.error('JSON parse error:', e, stdout);
+            return res.status(500).json({ error: 'Failed to parse Python output' });
+        }
+    });
 });
 
 // Add endpoint to get all positions (was holdings)
