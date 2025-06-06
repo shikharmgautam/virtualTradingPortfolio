@@ -3,7 +3,11 @@ services:
     name: nifty50-backend
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: |
+      apt-get update && \
+      apt-get install -y python3 python3-pip && \
+      pip3 install --no-cache-dir -r requirements.txt && \
+      npm install
     startCommand: npm start
     envVars:
       - key: NODE_ENV
