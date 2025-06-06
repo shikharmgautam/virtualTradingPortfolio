@@ -16,7 +16,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const dbPath = process.env.DB_PATH || path.join('/tmp', 'data.ab');
+const dbPath = process.env.DB_PATH || path.join(__dirname, 'data.ab');
 console.log('Database path:', dbPath);
 
 const sqlite3 = require('sqlite3').verbose();
@@ -33,11 +33,13 @@ db.serialize(() => {
         price REAL,
         type TEXT,
         commission REAL,
-        pl REAL, // <-- Add this line
+        pl REAL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     )`, (err) => {
-        if (err) console.error('Error creating trades table:', err);
-
+        if (err) {
+            console.error('Error creating trades table:', err);
+            return; // Stop further execution if table creation fails
+        }
         // If the commission or pl column does not exist (old DB), add them
         db.all("PRAGMA table_info(trades)", (err, columns) => {
             if (err) return;
