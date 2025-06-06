@@ -5,11 +5,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/trade': 'http://localhost:3000',
-      '/holdings': 'http://localhost:3000',
-      '/trades': 'http://localhost:3000',
-      '/positions': 'http://localhost:3000',
-      '/stockdata': 'http://localhost:3000',
+      '/trade': 'https://nifty50-backend-vl5n.onrender.com',
+      '/holdings': 'https://nifty50-backend-vl5n.onrender.com',
+      '/trades': 'https://nifty50-backend-vl5n.onrender.com',
+      '/positions': 'https://nifty50-backend-vl5n.onrender.com',
+      '/stockdata': 'https://nifty50-backend-vl5n.onrender.com',
     }
   },
   preview: {
