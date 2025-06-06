@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bodyParser = require('body-parser');
 const { spawn } = require('child_process');
+const yahooFinance = require('yahoo-finance2').default;
 
 const app = express();
 
@@ -199,39 +200,32 @@ app.delete('/trade/:id', (req, res) => {
     );
 });
 
-// Add this endpoint to fetch stock data using Python script
-app.get('/stockdata/:symbol', (req, res) => {
+// Node-only endpoint for fetching stock data from Yahoo Finance
+app.get('/stockdata/:symbol', async (req, res) => {
     try {
         const symbol = req.params.symbol;
-        const py = spawn('python', [path.join(__dirname, 'fetch_stock_data.py'), symbol]);
-        let data = '';
-        let error = '';
-
-        py.stdout.on('data', (chunk) => {
-            data += chunk.toString();
-        });
-
-        py.stderr.on('data', (chunk) => {
-            error += chunk.toString();
-        });
-
-        py.on('close', (code) => {
-            if (code !== 0 || error) {
-                console.error('Python error:', error);
-                res.status(500).json({ error: error || `Python process exited with code ${code}` });
-            } else {
-                try {
-                    const parsed = JSON.parse(data);
-                    res.json(parsed);
-                } catch (e) {
-                    console.error('JSON parse error:', e, 'Raw data:', data);
-                    res.status(500).json({ error: 'Failed to parse Python output: ' + e.message });
-                }
-            }
-        });
-    } catch (err) {
-        console.error('Server error:', err);
-        res.status(500).json({ error: 'Server error' });
+        // Fetch quote data from Yahoo Finance
+        const queryOptions = { modules: ["price", "summaryDetail"] };
+        const data = await yahooFinance.quote(symbol, queryOptions);
+        if (!data || !data.price) {
+            return res.status(404).json({ error: `No data for ${symbol}` });
+        }
+        // Pick the fields you need
+        const result = {
+            symbol: data.price.symbol,
+            shortName: data.price.shortName,
+            regularMarketPrice: data.price.regularMarketPrice,
+            previousClose: data.price.regularMarketPreviousClose,
+            open: data.price.regularMarketOpen,
+            dayHigh: data.price.regularMarketDayHigh,
+            dayLow: data.price.regularMarketDayLow,
+            currency: data.price.currency,
+            timestamp: data.price.regularMarketTime,
+        };
+        return res.json(result);
+    } catch (e) {
+        console.error("Yahoo-Finance fetch error:", e);
+        return res.status(500).json({ error: e.message });
     }
 });
 
