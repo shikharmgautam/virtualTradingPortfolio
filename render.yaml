@@ -18,8 +18,8 @@ services:
     env: node
     plan: free
     # packageManager: npm
-    buildCommand: npm install && npm run build
-    startCommand: npm run preview -- --host 0.0.0.0 --port 8080
+    buildCommand: bun install && bunx vite build
+    startCommand: bunx vite preview -- --host 0.0.0.0 --port 8080
     autoDeploy: true
     rootDir: .
 
