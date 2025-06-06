@@ -10,7 +10,7 @@ export const fetchStockData = async (symbol) => {
 };
 
 const fetchStockDataFromPython = async (symbol) => {
-  const res = await fetch(`http://localhost:3000/stockdata/${encodeURIComponent(symbol)}`);
+  const res = await fetch(`https://nifty50-backend-vl5n.onrender.com/stockdata/${encodeURIComponent(symbol)}`);
   if (!res.ok) {
     throw new Error('Failed to fetch stock data from backend');
   }
